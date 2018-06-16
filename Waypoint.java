@@ -20,17 +20,24 @@ public class Waypoint {
 	}
 
     public double distanceTo(Location loc1) {
-		// Handles small distances well but no antipodal points
-    	double distance = 2*Math.asin(Math.pow(Math.sqrt((loc1.getLat()-lat)/2), 2)+Math.cos(loc1.getLat())*Math.cos(lat)*(Math.pow(Math.sin((loc1.getLon()-lon)/2),2)));
+		// Return distance in radians
+    	double a = Math.pow(Math.sin((loc1.getLatRadians()-this.getLatRadians())/2), 2)
+                + Math.cos(this.getLatRadians()) * Math.cos(loc1.getLatRadians()) * Math.pow(Math.sin((loc1.getLonRadians()-this.getLonRadians())/2), 2);
+    	double angle2 = 2 * Math.asin(Math.min(1, Math.sqrt(a)));
+
+        // convert back to degrees
+        angle2 = Math.toDegrees(angle2);
+
+        // each degree on a great circle of Earth is 60 nautical miles
+        double distance = 60 * angle2;
     	return distance;
 	}
     public double courseTo(Location loc1) {
-    	double course;
-    	if (Math.sin(loc1.getLon()-lon)<0) {
-            course=Math.acos((Math.sin(loc1.getLat())-Math.sin(lat)*Math.cos(this.distanceTo(loc1)))/(Math.sin(this.distanceTo(loc1))*Math.cos(lat)));
-    	} else {
-            course=2*Math.PI-Math.acos((Math.sin(loc1.getLat())-Math.sin(lat)*Math.cos(this.distanceTo(loc1)))/(Math.sin(this.distanceTo(loc1))*Math.cos(lat)));
-    	}
+    	double y = Math.sin(loc1.getLonRadians()-this.getLonRadians()) * Math.cos(loc1.getLatRadians());
+    	double x = Math.cos(this.getLatRadians())*Math.sin(loc1.getLatRadians()) -
+    	        Math.sin(this.getLatRadians())*Math.cos(loc1.getLatRadians())*Math.cos(loc1.getLonRadians()-this.getLonRadians());
+    	double result = Math.toDegrees(Math.atan2(y, x));
+    	double course = (result+360)%360;
     	return course;
     }
     public String toString() {
@@ -63,14 +70,18 @@ public class Waypoint {
         double distance = 60 * angle2;
     	return distance;
 	}
+    public double flatEartherDistance(Waypoint other) {
+    	double x = (other.getLon()-this.getLon()) * Math.cos((this.getLat()+other.getLat())/2);
+    	double y = (other.getLat()-this.getLat());
+    	double distance = Math.sqrt(x*x + y*y) * EARTHRADIUSNM;
+    	return distance;
+    }
     public double courseTo(Waypoint wp2) {
-    	double course;
-    	double intermediate = Math.acos((Math.sin(wp2.getLat())-Math.sin(lat)*Math.cos(this.distanceTo(wp2)))/(Math.sin(this.distanceTo(wp2))*Math.cos(lat)));
-    	if (Math.sin(wp2.getLon()-lon)<0) {
-            course=intermediate;
-    	} else {
-            course=2*Math.PI-intermediate;
-    	}
+    	double y = Math.sin(wp2.getLonRadians()-this.getLonRadians()) * Math.cos(wp2.getLatRadians());
+    	double x = Math.cos(this.getLatRadians())*Math.sin(wp2.getLatRadians()) -
+    	        Math.sin(this.getLatRadians())*Math.cos(wp2.getLatRadians())*Math.cos(wp2.getLonRadians()-this.getLonRadians());
+    	double result = Math.toDegrees(Math.atan2(y, x));
+    	double course = (result+360)%360;
     	return course;
     }
     public double getLat() {

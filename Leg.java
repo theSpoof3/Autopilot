@@ -35,12 +35,15 @@ public class Leg {
 	public String getName() {
 		return name;
 	}
-	public double getClimbRate() {
+	public double getClimbRate(Location start) {
 		double time = 1.0/(airspeed/length);
 		double altDifference = start.getAlt()-end.getAlt();
 		return altDifference/time;
 	}
 	public Waypoint getStart() {
 		return start;
+	}
+	public Waypoint getEnd() {
+		return end;
 	}
 }

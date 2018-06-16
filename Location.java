@@ -1,5 +1,4 @@
 package autopilot;
-import java.util.ArrayList;
 public class Location {
 	private double lat;
 	private double lon;
@@ -20,9 +19,7 @@ public class Location {
 	public Location(Waypoint wp) {
 		this(wp.getLat(), wp.getLon(), wp.getAlt(), 15, 15, 0,0);
 	}
-	public Location(ArrayList<Double> a) {
-		this(a.get(0), a.get(1), a.get(2), a.get(3), a.get(4), a.get(5), a.get(6));
-	}
+
 	public double getAlt() {
 		return alt;
 	}
@@ -53,6 +50,12 @@ public class Location {
 	public String toString() {
 		String s = lat + ", " + lon + ", " + alt + ", " + airspeed + ", " + groundspeed + ", " + cog + ", " + heading;
     	return s;
+	}
+	public double getLatRadians() {
+		return (Math.toRadians(lat));
+	}
+	public double getLonRadians() {
+		return (Math.toRadians(lon));
 	}
 
 }
